@@ -1,0 +1,14 @@
+.container-fluid .row{
+    display: flex;
+    justify-content: space-evenly;
+    border: 1px solid;
+}
+.row nav{
+    display: flex;
+    border: 2px solid;
+    /* justify-content: space-between; */
+}
+
+ul li{
+    display: inline-block;
+}

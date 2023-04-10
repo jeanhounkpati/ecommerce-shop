@@ -1,0 +1,499 @@
+<a href="" class="col-md-3 rounded second">
+	<!-- 	<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+
+	</a>
+ 
+	<a href="" class="col-md-3 rounded third">
+		<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+
+	</a>
+		
+	<a href="" class="col-md-3 rounded fourth">
+		<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+
+	</a>
+</div>
+<div class="row">
+	<a href="" class="col-md-3 rounded fifth">
+		<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+
+	</a>
+	<a href="" class= "col-md-3 rounded sixth">
+		<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+	</a>
+	<a href="" class="col-md-3  rounded seventh">
+		<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+
+	</a>
+	<a href="" class="col-md-3 rounded eight">
+		<div >
+			<button type="submit" class="btn btn-success">Ajouter</button>
+		</div>
+
+	</a>
+ -->
+
+</div>
+	<p>voici un essai</p>
+
+
+
+<a class="add"  href="cartContoller.php?id=<?= $product->id; ?>">Ajouter</a>
+	<a href="addProduct.php">add</a>	
+					<a href="showProduct.php?id=<?= $product->id; ?>">show</a>	
+					<a href="deleteProduct.php?id=<?= $product->id; ?>">delete</a>	
+					<a href="updateProduct.php?id=<?= $product->id; ?>">update</a>
+
+
+<?php foreach($products as $product):?>
+			<tr>
+				<th scope="row"><?= $product->id; ?></th>
+				<td><?= $product->name; ?></td>
+				<td><?= $product->description; ?></td>
+				<td><img src="uploads/<?= $product->file; ?>" style="width: 100px; height: 100px" alt="good"></td>
+           </tr>				
+		<?php endforeach ?>
+echo "<td><img src="uploads/<?= $product->file; ?>" style="width: 100px; height: 100px" alt="good"></td>";
+    data-id="<?= $product->id; ?>"
+	<strong>hey</strong><?=$_SESSION['message'];?>
+
+<?php
+	if(isset($_SESSION['message']))
+	{
+
+	?>
+	<div class="alert alert-success" role="alert">
+		<?=$_SESSION['message'];?>	
+	</div>
+
+	<?php
+	unset($_SESSION['message']);
+	}
+	?>	
+
+
+	<!-- <script>
+$(document).ready(function() {
+  // handle minus button click
+  $('.minus-btn').on('click', function(e) {
+    e.preventDefault();
+    var quantityInput = $(this).parent().siblings('.quantity-input');
+    var currentVal = parseInt(quantityInput.val());
+    if (currentVal > 1) {
+      quantityInput.val(currentVal - 1);
+    }
+  });
+
+  // handle plus button click
+  $('.plus-btn').on('click', function(e) {
+    e.preventDefault();
+    var quantityInput = $(this).parent().siblings('.quantity-input');
+    var currentVal = parseInt(quantityInput.val());
+    quantityInput.val(currentVal + 1);
+  });
+});
+</script> -->
+
+
+
+
+<?php
+session_start();
+if(isset($_SESSION['auth']))
+{
+    if(isset($_POST['scope']))
+    {
+        $scope = $_POST['scope'];
+        switch($scope)
+        {
+            case 'add':
+                $prod_id = $_POST['prod_id'];
+                $prod_qty = $_POST['prod_qty'];
+                $user_id = $_SESSION["auth_user"]["id"];
+                include 'database.php';
+
+                global $PDO;
+
+                // Get the product price for the product being added to the cart
+                $req = $PDO->prepare("SELECT price FROM products WHERE id = :prod_id");
+                $req->execute(['prod_id' => $prod_id]);
+                $product_price = $req->fetch(PDO::FETCH_OBJ)->price;
+
+                // Check if the product is already in the cart
+                $req = $PDO->prepare("SELECT * FROM carts WHERE prod_id = :prod_id AND user_id = :user_id");
+                $req->execute(['prod_id' => $prod_id, 'user_id' => $user_id]);
+                $result = $req->fetch(PDO::FETCH_OBJ);
+                if ($result != false)
+                {
+                    echo "existing";
+                }
+                else
+                {
+                    // Add the product to the cart
+                    $subtotal = $prod_qty * $product_price;
+                    $q=$PDO->prepare("INSERT INTO cartproducts(cart_id,prod_id,prod_qty,subtotal) VALUES(:cart_id,:prod_id,:prod_qty,:subtotal)");
+                    $q->execute([
+                        'cart_id'=>$cart_id,
+                        'prod_id'=>$product->id,
+                        'prod_qty'=>$prod_qty,
+                        'subtotal'=>$subtotal,
+                    ]);
+
+                    // Update the cart total
+                    $req = $PDO->prepare("SELECT SUM(subtotal) as total FROM cartproducts WHERE cart_id = :cart_id");
+                    $req->execute(['cart_id' => $cart_id]);
+                    $total = $req->fetch(PDO::FETCH_OBJ)->total;
+                    $q=$PDO->prepare("UPDATE carts SET total = :total WHERE id = :cart_id");
+                    $q->execute([
+                        'total'=>$total,
+                        'cart_id'=>$cart_id,
+                    ]);
+                }
+        }
+    }
+}
+?>
+
+
+<td><img src="../uploads/<?= $cart->file; ?>" style="width: 100px; height: 100px" alt="good"></td>
+				<td><a href="deleteCategory.php?id=<?= $cart->id; ?>">Delete</a></td>
+				<td><a href="updateCategory.php?id=<?= $cart->id; ?>">Update</a></td>
+
+
+<?php
+// Connect to the database
+$conn = mysqli_connect("hostname", "username", "password", "database_name");
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Search keyword
+$keyword = $_POST['keyword'];
+
+// SQL query
+$sql = "SELECT * FROM table_name WHERE column_name LIKE '%$keyword%'";
+$result = mysqli_query($conn, $sql);
+
+// Loop through the results and output them
+if (mysqli_num_rows($result) > 0) {
+    while($row = mysqli_fetch_assoc($result)) {
+        echo "Column Name: " . $row["column_name"]. "<br>";
+    }
+} else {
+    echo "No results found for '$keyword'.";
+}
+
+// Close the connection
+mysqli_close($conn);
+?>
+
+2-another method
+
+<form method="GET" action="search.php">
+  <input type="text" name="search_term" placeholder="Search...">
+  <button type="submit">Search</button>
+</form>
+
+
+<?php
+// Get the search term from the form
+$search_term = $_GET['search_term'];
+
+// Connect to the database
+$conn = mysqli_connect('localhost', 'username', 'password', 'database');
+
+// Construct the query
+$query = "SELECT * FROM my_table WHERE column LIKE '%$search_term%'";
+
+// Execute the query
+$result = mysqli_query($conn, $query);
+
+// Check if the query was successful
+if ($result) {
+  // Loop through the results and display them
+  while ($row = mysqli_fetch_assoc($result)) {
+    echo '<p>' . $row['column'] . '</p>';
+  }
+} else {
+  // Handle the error
+  echo 'Error: ' . mysqli_error($conn);
+}
+
+// Close the database connection
+mysqli_close($conn);
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Results</title>
+</head>
+<body>
+  <?php
+  // Display the search results
+  while ($row = mysqli_fetch_assoc($result)) {
+    echo '<p>' . $row['column'] . '</p>';
+  }
+  ?>
+</body>
+</html>
+
+
+
+
+
+$(function() {
+  // Get the container element and the stories
+  var container = $('#stories-container');
+  var stories = container.find('.btn');
+
+  // Set the current story index to 0
+  var currentStoryIndex = 0;
+
+  // Add event listeners for mousewheel and touch events
+  container.on('mousewheel DOMMouseScroll', function(e) {
+    e.preventDefault(); // Prevent the default scrolling behavior
+
+    var delta = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+
+    if (delta < 0) {
+      // Scroll to the next story
+      if (currentStoryIndex < stories.length - 1) {
+        currentStoryIndex++;
+        container.animate({
+          scrollLeft: container.scrollLeft() + container.width()
+        }, 500);
+      }
+    } else if (delta > 0) {
+      // Scroll to the previous story
+      if (currentStoryIndex > 0) {
+        currentStoryIndex--;
+        container.animate({
+          scrollLeft: container.scrollLeft() - container.width()
+        }, 500);
+      }
+    }
+  });
+
+  container.on('touchstart', function(e) {
+    // Get the initial touch position
+    var initialTouchX = e.originalEvent.touches[0].clientX;
+    var initialTouchY = e.originalEvent.touches[0].clientY;
+
+    container.on('touchmove', function(e) {
+      // Calculate the distance moved since the initial touch
+      var deltaX = initialTouchX - e.originalEvent.touches[0].clientX;
+      var deltaY = initialTouchY - e.originalEvent.touches[0].clientY;
+
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        e.preventDefault(); // Prevent the default scrolling behavior if the user is scrolling horizontally
+
+        if (deltaX < 0) {
+          // Scroll to the next story
+          if (currentStoryIndex < stories.length - 1) {
+            currentStoryIndex++;
+            container.animate({
+              scrollLeft: container.scrollLeft() + container.width()
+            }, 500);
+          }
+        } else if (deltaX > 0) {
+          // Scroll to the previous story
+          if (currentStoryIndex > 0) {
+            currentStoryIndex--;
+            container.animate({
+              scrollLeft: container.scrollLeft() - container.width()
+            }, 500);
+          }
+        }
+      }
+    });
+
+    container.on('touchend', function() {
+      container.off('touchmove touchend');
+    });
+  });
+});
+
+ <form method="POST" id="updateform"  enctype = "multipart/form-data">
+            <input type="hidden" name ='category_id' value='<?= $category[0]->id ; ?>'>
+			<input type="text" name ="name" value ='<?= $category[0]->name; ?>' placeholder="Name"><br>
+			<input type="text" name="description" value='<?= $category[0]->description; ?>' placeholder="Description"><br>
+			<input type="file" name="file" placeholder="upload your image"><br>
+			<input type="hidden" name ='old_file' value='<?= $category[0]->file ; ?>'>
+			<input type="submit" name="submit"> 
+    </form>
+
+     <form method="POST" id="updateproduct" action='' enctype = "multipart/form-data">
+            <input type="hidden" name ='product_id' value='<?= $product[0]->id ; ?>'>
+			<input type="text" name ="name" value='<?= $product[0]->name; ?>' placeholder="Name"><br>
+			<input type="text" name="description" value='<?= $product[0]->description; ?>' placeholder="Description"><br>
+            <input type="number" name="price" value='<?= $product[0]->price; ?>' placeholder="Price"><br>	
+			<input type="file" name="file" placeholder="upload your image"><br>
+			<input type="hidden" name ='old_file' value='<?= $product[0]->file ; ?>'>
+			<input type="submit" name="submit"> 
+    </form>	
+
+
+     <div class="input-group justify-content-center input product_data">
+                            <input type="hidden" class="prodId" value="<?=$product->prod_id; ?>">
+                            <div class="input-group-prepend">
+                                <button class="btn btn-primary minus-btn updateQty" type="button">-</button>
+                            </div>
+                            <input type="text" class="form-control text-center quantity-input" value="<?= $product->prod_qty ?>">
+                            <div class="input-group-prepend">
+                                <button class="btn btn-primary plus-btn updateQty" type="button">+</button>
+                            </div>
+                    </div>
+
+<!-- <div class="card">
+		<img src="uploads/<?= $product->file; ?>" class="card-img-fluid hover-scale" style="width: 50%; height: 50%; object-fit: cover;" alt="<?= $product->name ?>">
+		<div class="card-body d-flex justify-content-between">
+			<div>
+				<h5 class="card-title"><?= $product->name ?></h5>
+				<p class="card-text"><?= $product->description ?></p>
+			</div>
+			<div>
+				<a href="showProductDetails.php?id=<?= $product->id; ?>">
+				<i class="fa fa-eye" aria-hidden="true"></i>
+				</a>
+			</div>
+		</div>
+  	</div> -->
+
+     <?php
+                if(isset($_SESSION['auth']))
+                {
+                ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout.php">logout</a>
+                    </li>
+                <?php
+                }
+                else{
+                ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.php">register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.php">login</a>
+                    </li>
+                <?php
+                }
+                ?>
+
+
+ <?php
+    include 'database.php';
+    global $PDO;
+    $req=$PDO->prepare('SELECT * FROM products');
+    $req->execute();
+    $products=$req->fetchAll(PDO::FETCH_OBJ);
+    ?>
+    <?php foreach($products as $product):?>
+	<div class="col-md-4 mx-auto d-flex align-items-center justify-content-center">
+	  	<div class="card">
+    		<div class="d-flex align-items-center justify-content-center" style="height: 100%;">
+        		<img src="uploads/<?= $product->file; ?>" class="card-img-fluid hover-scale mt-4" style="width: 50%; height: 50%; object-fit: cover;" alt="<?= $product->name ?>">
+    		</div>
+    		<div class="card-body d-flex justify-content-between">
+				<div>
+					<h5 class="card-title"><?= $product->name ?></h5>
+					<p class="card-text"><?= $product->price ?></p>
+				</div>
+				<div>
+					<a href="showProductDetails.php?id=<?= $product->id; ?>">
+						<i class="fa fa-eye" aria-hidden="true"></i>
+					</a>
+				</div>
+    		</div>
+		</div>
+
+	</div>
+
+    <?php endforeach ?>
+
+
+    //   $("#live_search").keyup(function(){
+//     var input = $(this).val();
+//     alert(input);
+//     if(input != ""){
+//         $.ajax({
+//             url:"livesearch.php",
+//             method:"POST"?
+//             data={input:input},
+//             success:function(data){
+//                 $("#searchresult").html(data);
+//                 $("#searchresult").css("display","block");
+
+//             }
+//         })
+//     }else{
+//         $("#searchresult").css("display","none");
+//     }
+// });
+
+
+
+
+
+<?php 
+		if(isset($_POST['submit']))
+		{
+			extract($_POST);
+			extract($_FILES);
+			if (!empty($name) && !empty($description) && !empty($file))
+			{
+				include '../../database.php';
+				global $PDO;
+				
+				$file = $_FILES['file']['name'];
+				$new_file = $_FILES['file']['name'];
+				$old_file = $_POST['old_file'];
+				if($new_file != "")
+				{
+					
+					// $update_filename = $new_file;
+					$image_ext = pathinfo($new_file,PATHINFO_EXTENSION);
+					$update_filename = time().'.'.$image_ext;
+				}
+				else{
+					$update_filename = $old_file;
+				}
+				$path = '../../uploads';
+                $q=$PDO->prepare("UPDATE category SET name='$name',description ='$description', file='$update_filename' WHERE id=$category_id ");
+				$q->execute();
+                $categories=$q->fetchAll(PDO::FETCH_OBJ); 
+
+				if($_FILES['file']['tmp_name'] !="")
+				{
+					move_uploaded_file($_FILES['file']['tmp_name'],$path.'/'.$update_filename);
+					if(file_exists("../../uploads/".$old_file))
+					{
+						unlink("../../uploads/".$old_file);
+					}
+					else
+					{
+						echo "something went wrong";
+					}
+				}                               
+			}
+			else
+			{
+				echo "May complete the fields";
+			}
+		}
+?>
